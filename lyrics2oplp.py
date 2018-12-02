@@ -1,6 +1,7 @@
-import urllib.request as request
-from bs4 import BeautifulSoup
+import json
 import re
+from urllib import request, parse
+from bs4 import BeautifulSoup
 
 
 def identify_url(url):
@@ -31,11 +32,15 @@ def identify_url(url):
     return 'unknown'
 
 def html_from_url(url):
+    """Extracts html from a webpage."""
+
     response = request.urlopen(url)
     html = response.read()
     return html
 
 def lyrics_from_letrasmus(html):
+    """Extracts lyrics from the html of a webpage of 'letras.mus.br'."""
+
     lyrics = ''
     soup = BeautifulSoup(html, 'html.parser')
     verses = soup.select('.cnt-letra article p')
@@ -45,12 +50,22 @@ def lyrics_from_letrasmus(html):
 
     return lyrics
 
+def lyrics_from_vagalume(html):
+    """Extracts lyrics from a webpage of 'vagalume.com.br'.  """
+
+    soup = BeautifulSoup(html, 'html.parser')
+    lyrics = soup.select('#lyrics')[0].get_text('\n')
+    return lyrics
+
+
+
 def lyrics_from_url(url):
     """Return the lyrics extracted from a url."""
 
     source = identify_url(url)
     extractor = {
-        'letras': lyrics_from_letrasmus
+        'letras': lyrics_from_letrasmus,
+        'vagalume': lyrics_from_vagalume
     }
     html = html_from_url(url)
     if source in extractor:
