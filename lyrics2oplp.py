@@ -53,8 +53,14 @@ def lyrics_from_letrasmus(html):
 def lyrics_from_vagalume(html):
     """Extracts lyrics from a webpage of 'vagalume.com.br'.  """
 
+    lyrics = ''
     soup = BeautifulSoup(html, 'html.parser')
-    lyrics = soup.select('#lyrics')[0].get_text('\n')
+    verses = soup.select('#lyrics')[0].contents
+    for verse in verses:
+        if verse.name == 'br':
+            lyrics += '\n'
+        else:
+            lyrics += verse
     return lyrics
 
 
